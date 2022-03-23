@@ -1,75 +1,112 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:restaurant_app/models/restaurant.dart';
+import 'package:restaurant_app/screens/home/widgets/grid_card.dart';
+import 'package:restaurant_app/theme/style.dart';
+import 'widgets/search_section.dart';
+import 'widgets/list_card.dart';
 
-import '../../models/restaurant.dart';
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
-
   static const routeName = "/home";
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isGridMode = true;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-      future: DefaultAssetBundle.of(context)
-          .loadString("assets/json/local_restaurant.json"),
-      builder: (context, snapshot) {
-        final List<Restaurant> restaurants = parseRestaurant(snapshot.data);
-        // final Welcome data = parseRestaurant(snapshot.data);
-        // final List<Restaurant> restaurants = data.restaurants;
-        // final Welcome data = Welcome.fromJson(snapshot.data);
-        return ListView.builder(
-          itemCount: restaurants.length,
-          itemBuilder: (context, index) {
-            return RestaurantCard(restaurant: restaurants[index]);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("OurResto"),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8), color: secondaryColor),
+          child: const Icon(
+            Icons.restaurant,
+            color: primaryColor,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              showSearch(context: context, delegate: SearchSection());
+            },
+            icon: const Icon(Icons.search),
+          ),
+          _popupMenuButton(),
+        ],
+      ),
+      body: SafeArea(
+        child: FutureBuilder<String>(
+          future: DefaultAssetBundle.of(context)
+              .loadString("assets/json/local_restaurant.json"),
+          builder: (context, snapshot) {
+            final List<Restaurant> restaurants = parseRestaurant(snapshot.data);
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return _isGridMode
+                  ? _gridBuilder(restaurants)
+                  : _listBuilder(restaurants);
+            }
           },
-        );
+        ),
+      ),
+    );
+  }
+
+  PopupMenuButton<int> _popupMenuButton() {
+    return PopupMenuButton(
+      itemBuilder: (context) {
+        return [
+          const PopupMenuItem(
+            child: Text("Grid Mode"),
+            value: 0,
+          ),
+          const PopupMenuItem(
+            child: Text("List Mode"),
+            value: 1,
+          ),
+        ];
+      },
+      onSelected: (value) {
+        if (value == 0) {
+          setState(() {
+            _isGridMode = true;
+          });
+        } else {
+          setState(() {
+            _isGridMode = false;
+          });
+        }
       },
     );
   }
-}
 
-class RestaurantCard extends StatelessWidget {
-  const RestaurantCard({
-    Key? key,
-    required this.restaurant,
-  }) : super(key: key);
-
-  final Restaurant restaurant;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
+  ListView _listBuilder(List<Restaurant> restaurants) {
+    return ListView.builder(
       padding: const EdgeInsets.all(14),
-      child: Row(
-        children: [
-          Expanded(
-              child: Image.network(
-            restaurant.pictureId,
-            fit: BoxFit.cover,
-          )),
-          Column(
-            children: [
-              Text(
-                restaurant.name,
-              ),
-              Text(restaurant.city),
-              RatingBar.builder(
-                minRating: 1,
-                itemCount: 5,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                initialRating: restaurant.rating,
-                itemSize: 12,
-                itemBuilder: (context, _) => const Icon(
-                  Icons.star,
-                  color: Colors.amber,
-                ),
-                onRatingUpdate: (x) => print(x),
-              ),
-            ],
-          )
-        ],
+      itemBuilder: (context, index) {
+        return ListCard(restaurant: restaurants[index]);
+      },
+      itemCount: restaurants.length,
+    );
+  }
+
+  GridView _gridBuilder(List<Restaurant> restaurants) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(14),
+      itemCount: restaurants.length,
+      itemBuilder: (context, index) {
+        return GridCard(restaurant: restaurants[index]);
+      },
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 5 / 6,
       ),
     );
   }

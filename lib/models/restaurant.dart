@@ -1,10 +1,23 @@
 import 'dart:convert';
-
 List<Restaurant> parseRestaurant(String? json) {
   if (json == null) {
     return [];
   }
   return LocalRestaurant.fromJson(jsonDecode(json)).restaurants;
+}
+
+List<Restaurant> searchRestaurant(String? json, String query) {
+  if (json == null) {
+    return [];
+  }
+  List<Restaurant> restaurants =
+      LocalRestaurant.fromJson(jsonDecode(json)).restaurants;
+  return restaurants.where((restaurant) {
+    final name = restaurant.name.toLowerCase();
+    final city = restaurant.city.toLowerCase();
+    final search = query.toLowerCase();
+    return name.contains(search) || city.contains(search);
+  }).toList();
 }
 
 class LocalRestaurant {

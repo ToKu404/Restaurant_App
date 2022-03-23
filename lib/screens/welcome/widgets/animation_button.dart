@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/theme/style.dart';
 
 class AnimatedButton extends StatefulWidget {
   const AnimatedButton({
@@ -22,8 +23,9 @@ class _AnimatedButtonState extends State<AnimatedButton>
       duration: const Duration(milliseconds: 700),
     )..repeat(reverse: true);
 
-    _animation = Tween(begin: const Offset(-0.05, 0), end: const Offset(0.05, 0))
-        .animate(_controller);
+    _animation =
+        Tween(begin: const Offset(-0.05, 0), end: const Offset(0.05, 0))
+            .animate(_controller);
   }
 
   @override
@@ -38,6 +40,7 @@ class _AnimatedButtonState extends State<AnimatedButton>
         child: const Icon(
           Icons.keyboard_arrow_right_outlined,
           size: 28,
+          color: secondaryColor,
         ),
       ),
     );
