@@ -8,7 +8,6 @@ const Color subtextColor = Color(0xFFABAEB5);
 final BoxShadow myBoxShadow =
     BoxShadow(color: const Color(0xFF000000).withOpacity(.05), blurRadius: 8);
 final BorderRadius myBorderRadius = BorderRadius.circular(8);
-
 final TextTheme myTextTheme = TextTheme(
   headline1: GoogleFonts.montserrat(
       fontSize: 97, fontWeight: FontWeight.w300, letterSpacing: -1.5),

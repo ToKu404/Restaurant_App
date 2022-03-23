@@ -22,7 +22,6 @@ class FakeData {
     int index = Random().nextInt(_fakeFood.length);
     return _fakeFood[index];
   }
-
   static String getRandomDrink() {
     int index = Random().nextInt(_fakeDrink.length);
     return _fakeDrink[index];
